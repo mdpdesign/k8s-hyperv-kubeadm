@@ -1,9 +1,14 @@
 ---
 - name: Configure loadbalancer
-  hosts: localhost
+  hosts: loadbalancer*
   connection: local
   become: yes
   tasks:
-    - name: Show variables
-      ansible.builtin.debug:
-        var: ansible_facts
+    - name: Install LB packages
+      ansible.builtin.apt:
+        name:
+          - keepalived
+          - haproxy
+        state: present
+        update_cache: true
+        autoclean: true

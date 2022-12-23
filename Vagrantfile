@@ -16,6 +16,11 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 Vagrant.configure(2) do |config|
 
+  # Need to clarify why that didn't work OOB
+  # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
+  # config.vm.synced_folder ".", "/vagrant", type: "smb"
+  config.vm.synced_folder ".", "/vagrant"
+
   # Setup static IP for the given vSwitch
   config.vm.provision "staticip", type: "shell", path: "scripts/static_ip.sh", reboot: true
 
@@ -48,19 +53,12 @@ Vagrant.configure(2) do |config|
         IP_ADDRESS: "172.16.0.5#{i}"
       }
 
+      # Allow to run single provisioner by specifying name
+      # vagrant provision loadbalancer1 --provision-with mainconfig
       lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.playbook = "ansible/lb.yml"
+        ans.provisioning_path = "/vagrant/ansible"
+        ans.playbook = "lb.yaml"
       end
-
-      # lb.vm.provision "ansible_local" do |ans|
-      #   ans.playbook = "playbook.yml"
-      #   ans.host_vars = {
-      #     "host1" => {"http_port" => 80,
-      #                 "maxRequestsPerChild" => 808},
-      #     "host2" => {"http_port" => 303,
-      #                 "maxRequestsPerChild" => 909}
-      #   }
-      # end
 
     end
 
