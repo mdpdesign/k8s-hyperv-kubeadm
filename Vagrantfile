@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
         IP_ADDRESS: "172.16.0.5#{i}"
       }
 
-      lb.vm.provision "mainconfig" "ansible_local" do |ans|
+      lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
         ans.playbook = "ansible/lb.yml"
       end
 
