@@ -2,7 +2,7 @@
 - name: Configure loadbalancer
   hosts: loadbalancer*
   connection: local
-  become: yes
+  become: true
   tasks:
     - name: Install LB packages
       ansible.builtin.apt:
@@ -12,3 +12,27 @@
         state: present
         update_cache: true
         autoclean: true
+
+    - name: Create API check script
+      ansible.builtin.template:
+        src: check_apiserver.sh.j2
+        dest: /etc/keepalived/check_apiserver.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create Keepalived configuration
+      ansible.builtin.template:
+        src: keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Keepalived
+
+  handlers:
+    - name: Restart Keepalived
+      ansible.builtin.service:
+        name: keepalived
+        state: restarted
+        enabled: true
