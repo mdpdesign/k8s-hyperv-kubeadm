@@ -1,0 +1,2 @@
+# Virtual IP used for keepalived
+vip: 172.16.0.100

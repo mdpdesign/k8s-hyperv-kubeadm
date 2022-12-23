@@ -48,6 +48,20 @@ Vagrant.configure(2) do |config|
         IP_ADDRESS: "172.16.0.5#{i}"
       }
 
+      lb.vm.provision "mainconfig" "ansible_local" do |ans|
+        ans.playbook = "ansible/lb.yml"
+      end
+
+      # lb.vm.provision "ansible_local" do |ans|
+      #   ans.playbook = "playbook.yml"
+      #   ans.host_vars = {
+      #     "host1" => {"http_port" => 80,
+      #                 "maxRequestsPerChild" => 808},
+      #     "host2" => {"http_port" => 303,
+      #                 "maxRequestsPerChild" => 909}
+      #   }
+      # end
+
     end
 
   end

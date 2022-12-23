@@ -1,0 +1,9 @@
+---
+- name: Configure loadbalancer
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: Show variables
+      ansible.builtin.debug:
+        var: ansible_facts
