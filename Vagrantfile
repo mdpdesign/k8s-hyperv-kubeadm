@@ -11,6 +11,7 @@
 # https://opentechtips.com/how-to-create-nat-ed-subnets-in-hyper-v/
 # https://mytechiethoughts.com/windows/hyper-v-default-switch-easy-lan-internet-access-for-guest-vms/
 # https://automatingops.com/allowing-windows-subsystem-for-linux-to-communicate-with-hyper-v-vms
+# https://kubernetes.io/blog/2019/03/15/kubernetes-setup-using-ansible-and-vagrant/
 
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
@@ -94,6 +95,12 @@ Vagrant.configure(2) do |config|
       masternode.vm.provision "staticip", type: "shell", env: {
         IP_ADDRESS: "172.16.0.10#{i}"
       }
+
+      masternode.vm.provision "mainconfig", type: "ansible_local" do |ans|
+        ans.provisioning_path = "/vagrant/ansible"
+        ans.playbook = "kmaster.yaml"
+        ans.verbose = "-vvv"
+      end
 
     end
 
