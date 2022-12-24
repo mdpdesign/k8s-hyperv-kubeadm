@@ -81,8 +81,9 @@ Vagrant.configure(2) do |config|
       masternode.vm.network "private_network", bridge: "K8sLabSwitch"
 
       masternode.vm.provider :hyperv do |v|
-        v.memory  = 1024
-        v.maxmemory  = 2048
+        # kubeadm requires at least 1700Mb
+        v.memory  = 2048
+        # v.maxmemory  = 2048
         v.cpus    = 2
 
         v.enable_virtualization_extensions  = true
@@ -100,6 +101,7 @@ Vagrant.configure(2) do |config|
         ans.provisioning_path = "/vagrant/ansible"
         ans.playbook = "kmaster.yaml"
         ans.verbose = "-vvv"
+        # ans.tags = "copy_kubeconfig"
       end
 
     end
