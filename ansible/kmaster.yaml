@@ -95,25 +95,39 @@
       block:
         - name: Initialize K8s cluster with kubeadm
           ansible.builtin.command: kubeadm init --control-plane-endpoint="{{ vip }}:6443" --upload-certs --apiserver-advertise-address={{ ansible_default_ipv4.address }} --pod-network-cidr=192.168.0.0/16
+          register: kubeadm_init_cmd
 
         - name: Install CNI - calico
           ansible.builtin.command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/calico.yaml
           environment:
             KUBECONFIG: /etc/kubernetes/admin.conf
 
-        - name: Generate K8s cluster join command
-          ansible.builtin.command: kubeadm token create --print-join-command
-          register: join_command
-
         - name: Write join command to local file
           ansible.builtin.copy:
-            content: "{{ join_command.stdout_lines[0] }}"
+            content: "{{ kubeadm_init_cmd.stdout }}"
             dest: /home/vagrant/join-command
       when: ansible_hostname == primary_master_hostname
 
-    # TODO: This does not work!
-    - name: Join other masters to cluster
-      ansible.builtin.command: "{{ join_command.stdout_lines[0] }}"
+    # Fetch join command from primary master, ugly but works..
+    - name: Fetch join command from primary master
+      ansible.builtin.shell:
+        cmd: >-
+          /usr/bin/sshpass -p "vagrant"
+          scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+          vagrant@172.16.0.101:/home/vagrant/join-command /home/vagrant/join-command
+          && chown vagrant:vagrant /home/vagrant/join-command
+      when: not ansible_hostname == primary_master_hostname
+      register: copy_join_cmd
+      until: copy_join_cmd is not failed
+      retries: 10
+      delay: 10
+
+    - name: Join node to cluster
+      ansible.builtin.shell:
+        cmd: |
+          # Extract only control-plane join command - rudimentary but works
+          grep -A3 "kubeadm join" /home/vagrant/join-command | head -3 | tee /home/vagrant/join-command
+          chmod +x /home/vagrant/join-command && bash /home/vagrant/join-command
       when: not ansible_hostname == primary_master_hostname
 
     - name: Create .kube directory for vagrant user

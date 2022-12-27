@@ -13,17 +13,21 @@
 # https://automatingops.com/allowing-windows-subsystem-for-linux-to-communicate-with-hyper-v-vms
 # https://kubernetes.io/blog/2019/03/15/kubernetes-setup-using-ansible-and-vagrant/
 
-ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+# TODO: Check if needed
+# ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 Vagrant.configure(2) do |config|
 
-  # Need to clarify why that didn't work OOB
-  # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
-  # config.vm.synced_folder ".", "/vagrant", type: "smb"
-  config.vm.synced_folder ".", "/vagrant"
-
   # Setup static IP for the given vSwitch
-  config.vm.provision "staticip", type: "shell", path: "scripts/static_ip.sh", reboot: true
+  config.vm.provision "staticip", type: "shell", path: "scripts/static_ip.sh", reset: true
+  
+  # Just upload files to VMs, synced folders with Hyper-V are problematic
+  config.vm.provision "uploadfiles", type: "file", run: "always", source: "ansible", destination: "/tmp/ansible"
+  
+  # Need to clarify why auto mount sync folder didn't work OOB
+  # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
+  # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
+  # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
 
   # Load Balancer Nodes
   LoadBalancerCount = 2
@@ -57,7 +61,7 @@ Vagrant.configure(2) do |config|
       # Allow to run single provisioner by specifying name
       # vagrant provision loadbalancer1 --provision-with mainconfig
       lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.provisioning_path = "/vagrant/ansible"
+        ans.provisioning_path = "/tmp/ansible"
         ans.playbook = "lb.yaml"
       end
 
@@ -83,7 +87,6 @@ Vagrant.configure(2) do |config|
       masternode.vm.provider :hyperv do |v|
         # kubeadm requires at least 1700Mb
         v.memory  = 2048
-        # v.maxmemory  = 2048
         v.cpus    = 2
 
         v.enable_virtualization_extensions  = true
@@ -98,10 +101,9 @@ Vagrant.configure(2) do |config|
       }
 
       masternode.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.provisioning_path = "/vagrant/ansible"
+        ans.provisioning_path = "/tmp/ansible"
         ans.playbook = "kmaster.yaml"
-        ans.verbose = "-vvv"
-        # ans.tags = "copy_kubeconfig"
+        ans.verbose = "-v"
       end
 
     end
@@ -124,8 +126,7 @@ Vagrant.configure(2) do |config|
       workernode.vm.network "private_network", bridge: "K8sLabSwitch"
 
       workernode.vm.provider :hyperv do |v|
-        v.memory  = 1024
-        v.maxmemory  = 2048
+        v.memory  = 2048
         v.cpus    = 2
         
         v.enable_virtualization_extensions  = true
