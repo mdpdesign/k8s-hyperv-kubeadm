@@ -17,7 +17,7 @@ network:
       addresses: [${IP_ADDRESS}/24]
       gateway4: 172.16.0.1
       nameservers:
-        addresses: [188.117.143.11, 8.8.8.8, 172.16.0.1]
+        addresses: [8.8.8.8, 1.1.1.1]
 EOF
 
   netplan apply
