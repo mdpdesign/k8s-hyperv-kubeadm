@@ -140,6 +140,12 @@ Vagrant.configure(2) do |config|
         IP_ADDRESS: "172.16.0.20#{i}"
       }
 
+      workernode.vm.provision "mainconfig", type: "ansible_local" do |ans|
+        ans.provisioning_path = "/tmp/ansible"
+        ans.playbook = "kworker.yaml"
+        ans.verbose = "-v"
+      end
+
     end
 
   end
