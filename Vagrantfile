@@ -20,10 +20,10 @@ Vagrant.configure(2) do |config|
 
   # Setup static IP for the given vSwitch
   config.vm.provision "staticip", type: "shell", path: "scripts/static_ip.sh", reset: true
-  
+
   # Just upload files to VMs, synced folders with Hyper-V are problematic
   config.vm.provision "uploadfiles", type: "file", run: "always", source: "ansible", destination: "/tmp/ansible"
-  
+
   # Need to clarify why auto mount sync folder didn't work OOB
   # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
   # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
@@ -128,7 +128,7 @@ Vagrant.configure(2) do |config|
       workernode.vm.provider :hyperv do |v|
         v.memory  = 2048
         v.cpus    = 2
-        
+
         v.enable_virtualization_extensions  = true
         v.linked_clone = true
         v.vm_integration_services = {
