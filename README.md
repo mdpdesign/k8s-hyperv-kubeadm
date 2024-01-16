@@ -55,6 +55,11 @@ curl -v -k https://172.16.0.100:6443/healthz
 For Vagrant to work with Hyper-V - Terminal must be run as Administrator user
 
 ```powershell
+# Simply
+vagrant up
+
+# or when setup was already provisioned before etc.
+vagrant up --parallel
 vagrant up loadbalancer1 loadbalancer2 --parallel
 vagrant up kmaster1 kmaster2 kmaster3 kworker1 --parallel
 ```
@@ -65,6 +70,11 @@ Stopping Kubernetes setup
 vagrant halt
 ```
 
+Destroying Kubernetes setup
+
+```powershell
+vagrant destroy --force
+```
 
 ## Recommended tools to work easier with Kubernetes
 
