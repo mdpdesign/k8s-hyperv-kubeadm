@@ -47,7 +47,7 @@ Vagrant.configure(2) do |config|
       lb.vm.network "public_network", bridge: "K8sLabSwitch"
 
       lb.vm.provider :hyperv do |v|
-        v.memory  = 512
+        v.memory  = 768
         v.cpus    = 1
 
         v.enable_virtualization_extensions  = true
