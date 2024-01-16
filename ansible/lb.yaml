@@ -1,6 +1,6 @@
 ---
 - name: Configure loadbalancer
-  hosts: loadbalancer*
+  hosts: lb*
   connection: local
   become: true
   tasks:

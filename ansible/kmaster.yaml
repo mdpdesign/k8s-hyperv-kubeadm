@@ -1,6 +1,6 @@
 ---
 - name: Configure Kubernetes Masters
-  hosts: kmaster*
+  hosts: km*
   connection: local
   become: true
   tasks:

@@ -28,18 +28,21 @@ Vagrant.configure(2) do |config|
   # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
   # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
   # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
+  
+  box_name = "generic/ubuntu2204"
+  box_version = "4.3.10"
 
   # Load Balancer Nodes
   LoadBalancerCount = 2
 
   (1..LoadBalancerCount).each do |i|
 
-    config.vm.define "loadbalancer#{i}" do |lb|
+    config.vm.define "lb#{i}" do |lb|
 
-      lb.vm.box               = "generic/ubuntu2004"
+      lb.vm.box               = box_name
       lb.vm.box_check_update  = false
-      lb.vm.box_version       = "4.2.6"
-      lb.vm.hostname          = "loadbalancer#{i}.lab.local"
+      lb.vm.box_version       = box_version
+      lb.vm.hostname          = "lb#{i}.lab.local"
 
       lb.vm.network "public_network", bridge: "K8sLabSwitch"
 
@@ -59,7 +62,7 @@ Vagrant.configure(2) do |config|
       }
 
       # Allow to run single provisioner by specifying name
-      # vagrant provision loadbalancer1 --provision-with mainconfig
+      # vagrant provision lb1 --provision-with mainconfig
       lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
         ans.provisioning_path = "/tmp/ansible"
         ans.playbook = "lb.yaml"
@@ -75,12 +78,12 @@ Vagrant.configure(2) do |config|
 
   (1..MasterCount).each do |i|
 
-    config.vm.define "kmaster#{i}" do |masternode|
+    config.vm.define "km#{i}" do |masternode|
 
-      masternode.vm.box               = "generic/ubuntu2004"
+      masternode.vm.box               = box_name
       masternode.vm.box_check_update  = false
-      masternode.vm.box_version       = "4.2.6"
-      masternode.vm.hostname          = "kmaster#{i}.lab.local"
+      masternode.vm.box_version       = box_version
+      masternode.vm.hostname          = "km#{i}.lab.local"
 
       masternode.vm.network "private_network", bridge: "K8sLabSwitch"
 
@@ -116,12 +119,12 @@ Vagrant.configure(2) do |config|
 
   (1..WorkerCount).each do |i|
 
-    config.vm.define "kworker#{i}" do |workernode|
+    config.vm.define "kw#{i}" do |workernode|
 
-      workernode.vm.box               = "generic/ubuntu2004"
+      workernode.vm.box               = box_name
       workernode.vm.box_check_update  = false
-      workernode.vm.box_version       = "4.2.6"
-      workernode.vm.hostname          = "kworker#{i}.lab.local"
+      workernode.vm.box_version       = box_version
+      workernode.vm.hostname          = "kw#{i}.lab.local"
 
       workernode.vm.network "private_network", bridge: "K8sLabSwitch"
 

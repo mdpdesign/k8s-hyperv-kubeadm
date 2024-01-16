@@ -1,6 +1,6 @@
 ---
 - name: Configure Kubernetes Workers
-  hosts: kworker*
+  hosts: kw*
   connection: local
   become: true
   tasks:
