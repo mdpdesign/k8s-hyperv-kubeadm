@@ -28,61 +28,9 @@
         - { port: 10250 }
         - { port: 30000:32767 }
 
-    - name: Containerd module prerequisites
-      ansible.builtin.template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        owner: root
-        group: root
-        mode: '0644'
-      loop:
-        - { src: "modules_k8s.conf.j2", dest: "/etc/modules-load.d/k8s.conf" }
-        - { src: "sysctl_k8s.conf.j2", dest: "/etc/sysctl.d/k8s.conf" }
-
-    - name: Apply sysctl parameters
-      ansible.builtin.shell:
-        cmd: |
-          modprobe overlay
-          modprobe br_netfilter
-          sysctl --system
-
-    - name: Add K8s apt key
-      ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        state: present
-
-    - name: Add K8s apt repository into sources list
-      ansible.builtin.apt_repository:
-        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-        state: present
-        filename: kubernetes.list
-
-    - name: Install container runtime and K8s binaries
-      ansible.builtin.apt:
-        name:
-          - apt-transport-https
-          - containerd
-          - kubeadm=1.25.5-00
-          - kubelet=1.25.5-00
-          - kubectl=1.25.5-00
-        state: present
-        update_cache: true
-        autoclean: true
-
-    - name: Generate default containerd config
-      ansible.builtin.shell:
-        cmd: |
-          mkdir -p /etc/containerd
-          containerd config default > /etc/containerd/config.toml
-
-    - name: Start K8s services
-      ansible.builtin.service:
-        name: "{{ item }}"
-        state: started
-        enabled: true
-      loop:
-        - containerd
-        - kubelet
+    - name: Include containerd setup tasks
+      ansible.builtin.include_role:
+        name: containerd
 
     # Fetch join command from primary master, ugly but works..
     - name: Fetch join command from primary master
@@ -101,5 +49,8 @@
       ansible.builtin.shell:
         cmd: |
           # Extract only worker join command - rudimentary but works
+          set -o pipefail
           grep -A3 "kubeadm join" /home/vagrant/join-command | tail -2 | tee /home/vagrant/join-command
           chmod +x /home/vagrant/join-command && bash /home/vagrant/join-command
+      args:
+        executable: /usr/bin/bash
