@@ -34,6 +34,7 @@
         - { port: 2379:2380 }
         - { port: 60000:61000 }
 
+    # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
     - name: Containerd module prerequisites
       ansible.builtin.template:
         src: "{{ item.src }}"
@@ -52,25 +53,26 @@
           modprobe br_netfilter
           sysctl --system
 
-    - name: Add K8s apt key
-      ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        state: present
+    # TODO: configure kubelet cgroup drivers
+    # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers
 
-    - name: Add K8s apt repository into sources list
-      ansible.builtin.apt_repository:
-        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-        state: present
-        filename: kubernetes.list
+    - name: Add K8 repository
+      ansible.builtin.deb822_repository:
+        name: kubernetes
+        types: deb
+        uris: https://pkgs.k8s.io/core:/stable:/v1.29/deb/
+        suites: /
+        architectures: amd64
+        signed_by: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
 
     - name: Install container runtime and K8s binaries
       ansible.builtin.apt:
         name:
           - apt-transport-https
           - containerd
-          - kubeadm=1.25.5-00
-          - kubelet=1.25.5-00
-          - kubectl=1.25.5-00
+          - kubeadm=1.29.0-1.1
+          - kubelet=1.29.0-1.1
+          - kubectl=1.29.0-1.1
         state: present
         update_cache: true
         autoclean: true
@@ -80,6 +82,13 @@
         cmd: |
           mkdir -p /etc/containerd
           containerd config default > /etc/containerd/config.toml
+
+    # https://v1-25.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+    - name: Ensure containerd is using systemd cgroup driver
+      ansible.builtin.replace:
+        path: /etc/containerd/config.toml
+        regexp: '(\s+)SystemdCgroup = false$'
+        replace: '\1SystemdCgroup = true'
 
     - name: Start K8s services
       ansible.builtin.service:
@@ -97,8 +106,14 @@
           ansible.builtin.command: kubeadm init --control-plane-endpoint="{{ vip }}:6443" --upload-certs --apiserver-advertise-address={{ ansible_default_ipv4.address }} --pod-network-cidr=192.168.0.0/16
           register: kubeadm_init_cmd
 
+        # https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
+        # Uses the operator method - as it manages calico lifecycle
         - name: Install CNI - calico
-          ansible.builtin.command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/calico.yaml
+          ansible.builtin.shell:
+            cmd: |
+              kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
+              curl https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml -O
+              kubectl create -f custom-resources.yaml
           environment:
             KUBECONFIG: /etc/kubernetes/admin.conf
 

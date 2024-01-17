@@ -29,8 +29,8 @@ Vagrant.configure(2) do |config|
   # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
   # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
   
-  box_name = "generic/ubuntu2204"
-  box_version = "4.3.10"
+  ubnt_box_name = "generic/ubuntu2204"
+  ubnt_box_version = "4.3.10"
 
   # Load Balancer Nodes
   LoadBalancerCount = 2
@@ -39,9 +39,9 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "lb#{i}" do |lb|
 
-      lb.vm.box               = box_name
+      lb.vm.box               = ubnt_box_name
       lb.vm.box_check_update  = false
-      lb.vm.box_version       = box_version
+      lb.vm.box_version       = ubnt_box_version
       lb.vm.hostname          = "lb#{i}.lab.local"
 
       lb.vm.network "public_network", bridge: "K8sLabSwitch"
@@ -80,9 +80,9 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "km#{i}" do |masternode|
 
-      masternode.vm.box               = box_name
+      masternode.vm.box               = ubnt_box_name
       masternode.vm.box_check_update  = false
-      masternode.vm.box_version       = box_version
+      masternode.vm.box_version       = ubnt_box_version
       masternode.vm.hostname          = "km#{i}.lab.local"
 
       masternode.vm.network "private_network", bridge: "K8sLabSwitch"
@@ -121,9 +121,9 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "kw#{i}" do |workernode|
 
-      workernode.vm.box               = box_name
+      workernode.vm.box               = ubnt_box_name
       workernode.vm.box_check_update  = false
-      workernode.vm.box_version       = box_version
+      workernode.vm.box_version       = ubnt_box_version
       workernode.vm.hostname          = "kw#{i}.lab.local"
 
       workernode.vm.network "private_network", bridge: "K8sLabSwitch"

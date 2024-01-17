@@ -76,6 +76,14 @@ Destroying Kubernetes setup
 vagrant destroy --force
 ```
 
+## Development
+
+Running only main provisioning after VMs are set up with static IP:
+
+```powershell
+vagrant up km1 --provision-with uploadfiles,mainconfig
+```
+
 ## Recommended tools to work easier with Kubernetes
 
 - https://github.com/derailed/k9s

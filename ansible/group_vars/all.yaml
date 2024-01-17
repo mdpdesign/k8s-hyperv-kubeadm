@@ -1,4 +1,4 @@
 # Virtual IP used for keepalived
 vip: 172.16.0.100
 
-primary_master_hostname: kmaster1
+primary_master_hostname: km1
