@@ -3,20 +3,11 @@
   hosts: kw*
   connection: local
   become: true
+  roles:
+    - role: configure-swap
+      become: true
+
   tasks:
-
-    # K8s prerequisites
-    # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-    - name: Disable swap
-      ansible.builtin.command: swapoff -a
-
-    # https://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
-    - name: Disable swap permanently in fstab (comment out)
-      ansible.builtin.replace:
-        path: /etc/fstab
-        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-        replace: '# \1'
-
     # https://kubernetes.io/docs/reference/networking/ports-and-protocols/
     - name: Open required firewall ports
       community.general.ufw:
@@ -30,7 +21,7 @@
 
     - name: Include containerd setup tasks
       ansible.builtin.include_role:
-        name: containerd
+        name: install-containerd
 
     # Fetch join command from primary master, ugly but works..
     - name: Fetch join command from primary master

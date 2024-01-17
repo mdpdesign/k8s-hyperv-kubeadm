@@ -1,0 +1,11 @@
+# K8s prerequisites
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+- name: Disable swap
+  ansible.builtin.command: swapoff -a
+
+# https://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
+- name: Disable swap permanently in fstab (comment out)
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
