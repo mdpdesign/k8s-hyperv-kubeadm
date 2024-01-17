@@ -84,7 +84,22 @@ Running only main provisioning after VMs are set up with static IP:
 vagrant up km1 --provision-with uploadfiles,mainconfig
 ```
 
+Resetting kubeadm init:
+
+```bash
+sudo kubeadm reset
+sudo kubeadm init...
+```
+
 ## Recommended tools to work easier with Kubernetes
 
 - https://github.com/derailed/k9s
 - https://github.com/ahmetb/kubectx
+
+## TODO
+
+- Add WSL instructions
+  - Vagrant integration
+  - IPv6 issue
+- Add more Development instructions
+  - Hyper-V checkpoint to quickly restore VM etc.

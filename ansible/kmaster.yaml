@@ -53,9 +53,6 @@
           modprobe br_netfilter
           sysctl --system
 
-    # TODO: configure kubelet cgroup drivers
-    # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers
-
     - name: Add K8 repository
       ansible.builtin.deb822_repository:
         name: kubernetes
@@ -65,11 +62,46 @@
         architectures: amd64
         signed_by: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
 
-    - name: Install container runtime and K8s binaries
+    # https://github.com/containerd/containerd/blob/main/docs/getting-started.md
+    - name: Install recent version of containerd
+      block:
+        # Download containerd
+        - name: Download containerd
+          ansible.builtin.unarchive:
+            src: https://github.com/containerd/containerd/releases/download/v{{ version_containerd }}/containerd-{{ version_containerd }}-linux-amd64.tar.gz
+            dest: /usr/local
+            remote_src: true
+
+        - name: Download containerd service unit
+          ansible.builtin.get_url:
+            url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+            dest: /lib/systemd/system/containerd.service
+            mode: '0644'
+
+        # Download runc
+        - name: Download runc
+          ansible.builtin.get_url:
+            url: https://github.com/opencontainers/runc/releases/download/v{{ version_runc }}/runc.amd64
+            dest: /usr/local/sbin/runc
+            mode: '0755'
+
+        # Download CNI plugins
+        - name: Create CNI directory
+          ansible.builtin.file:
+            path: /opt/cni/bin
+            state: directory
+            mode: '0755'
+
+        - name: Download CNI plugins
+          ansible.builtin.unarchive:
+            src: https://github.com/containernetworking/plugins/releases/download/v{{ version_cni_plugins }}/cni-plugins-linux-amd64-v{{ version_cni_plugins }}.tgz
+            dest: /opt/cni/bin
+            remote_src: true
+
+    - name: Install K8s binaries
       ansible.builtin.apt:
         name:
           - apt-transport-https
-          - containerd
           - kubeadm=1.29.0-1.1
           - kubelet=1.29.0-1.1
           - kubectl=1.29.0-1.1
@@ -83,7 +115,8 @@
           mkdir -p /etc/containerd
           containerd config default > /etc/containerd/config.toml
 
-    # https://v1-25.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+    # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+    # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers
     - name: Ensure containerd is using systemd cgroup driver
       ansible.builtin.replace:
         path: /etc/containerd/config.toml
@@ -101,6 +134,7 @@
 
     # Initialize K8s cluster, run only on primary master
     - name: Initialize K8s cluster with kubeadm
+      when: ansible_hostname == primary_master_hostname
       block:
         - name: Initialize K8s cluster with kubeadm
           ansible.builtin.command: kubeadm init --control-plane-endpoint="{{ vip }}:6443" --upload-certs --apiserver-advertise-address={{ ansible_default_ipv4.address }} --pod-network-cidr=192.168.0.0/16
@@ -121,7 +155,6 @@
           ansible.builtin.copy:
             content: "{{ kubeadm_init_cmd.stdout }}"
             dest: /home/vagrant/join-command
-      when: ansible_hostname == primary_master_hostname
 
     # Fetch join command from primary master, ugly but works..
     - name: Fetch join command from primary master
@@ -140,6 +173,8 @@
     - name: Join node to cluster
       ansible.builtin.shell:
         cmd: |
+          set -o pipefail
+
           # Extract only control-plane join command - rudimentary but works
           grep -A3 "kubeadm join" /home/vagrant/join-command | head -3 | tee /home/vagrant/join-command
           chmod +x /home/vagrant/join-command && bash /home/vagrant/join-command
@@ -151,6 +186,7 @@
         state: directory
         owner: vagrant
         group: vagrant
+        mode: '0600'
 
     - name: Copy kubeconfig for vagrant user
       ansible.builtin.copy:
