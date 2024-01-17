@@ -32,20 +32,20 @@
     # Download containerd
     - name: Download containerd
       ansible.builtin.unarchive:
-        src: https://github.com/containerd/containerd/releases/download/v{{ version_containerd }}/containerd-{{ version_containerd }}-linux-amd64.tar.gz
+        src: "{{ containerd_url }}"
         dest: /usr/local
         remote_src: true
 
     - name: Download containerd service unit
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+        url: "{{ containerd_service_url }}"
         dest: /lib/systemd/system/containerd.service
         mode: '0644'
 
     # Download runc
     - name: Download runc
       ansible.builtin.get_url:
-        url: https://github.com/opencontainers/runc/releases/download/v{{ version_runc }}/runc.amd64
+        url: "{{ runc_url }}"
         dest: /usr/local/sbin/runc
         mode: '0755'
 
@@ -58,7 +58,7 @@
 
     - name: Download CNI plugins
       ansible.builtin.unarchive:
-        src: https://github.com/containernetworking/plugins/releases/download/v{{ version_cni_plugins }}/cni-plugins-linux-amd64-v{{ version_cni_plugins }}.tgz
+        src: "{{ cni_plugins_url }}"
         dest: /opt/cni/bin
         remote_src: true
 
@@ -66,9 +66,9 @@
   ansible.builtin.apt:
     name:
       - apt-transport-https
-      - kubeadm=1.29.0-1.1
-      - kubelet=1.29.0-1.1
-      - kubectl=1.29.0-1.1
+      - "kubeadm={{ kubernetes_version }}"
+      - "kubelet={{ kubernetes_version }}"
+      - "kubectl={{ kubernetes_version }}"
     state: present
     update_cache: true
     autoclean: true

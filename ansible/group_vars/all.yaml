@@ -2,7 +2,3 @@
 vip: 172.16.0.100
 
 primary_master_hostname: km1
-
-version_containerd: 1.7.12
-version_runc: 1.1.11
-version_cni_plugins: 1.4.0

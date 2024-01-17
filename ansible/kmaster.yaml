@@ -6,6 +6,8 @@
   roles:
     - role: configure-swap
       become: true
+    - role: install-tools
+      become: true
 
   tasks:
     # https://kubernetes.io/docs/reference/networking/ports-and-protocols/
