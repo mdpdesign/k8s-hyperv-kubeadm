@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "update", type: "shell", path: "scripts/update.sh", reboot: true
 
   # Just upload files to VMs, synced folders with Hyper-V are problematic
-  config.vm.provision "uploadfiles", type: "file", run: "always", source: "ansible", destination: "/tmp/ansible"
+  config.vm.provision "uploadfiles", type: "file", run: "always", source: "ansible", destination: "/home/vagrant/k8s-ansible"
 
   # Need to clarify why auto mount sync folder didn't work OOB
   # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
@@ -69,7 +69,7 @@ Vagrant.configure(2) do |config|
       # Allow to run single provisioner by specifying name
       # vagrant provision lb1 --provision-with mainconfig
       lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.provisioning_path = "/tmp/ansible"
+        ans.provisioning_path = "/home/vagrant/k8s-ansible"
         ans.playbook = "lb.yaml"
       end
 
@@ -111,7 +111,7 @@ Vagrant.configure(2) do |config|
       cp.vm.provision "update", type: "shell"
 
       cp.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.provisioning_path = "/tmp/ansible"
+        ans.provisioning_path = "/home/vagrant/k8s-ansible"
         ans.playbook = "kmaster.yaml"
         ans.verbose = "-v"
       end
@@ -153,7 +153,7 @@ Vagrant.configure(2) do |config|
       wrk.vm.provision "update", type: "shell"
 
       wrk.vm.provision "mainconfig", type: "ansible_local" do |ans|
-        ans.provisioning_path = "/tmp/ansible"
+        ans.provisioning_path = "/home/vagrant/k8s-ansible"
         ans.playbook = "kworker.yaml"
         ans.verbose = "-v"
       end
