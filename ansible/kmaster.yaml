@@ -112,6 +112,6 @@
           alias kn="kubectl config set-context --current --namespace"
           source <(kubectl completion bash)
           source <(helm completion bash)
+          complete -o default -F __start_kubectl k
         state: present
-        prepend_newline: true
-        append_newline: true
+        insertafter: EOF
