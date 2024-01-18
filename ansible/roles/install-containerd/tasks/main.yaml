@@ -1,3 +1,4 @@
+---
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 - name: Containerd module prerequisites
   ansible.builtin.template:

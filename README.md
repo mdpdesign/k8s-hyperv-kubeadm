@@ -60,8 +60,8 @@ vagrant up
 
 # or when setup was already provisioned before etc.
 vagrant up --parallel
-vagrant up loadbalancer1 loadbalancer2 --parallel
-vagrant up kmaster1 kmaster2 kmaster3 kworker1 --parallel
+vagrant up lb1 lb2 --parallel
+vagrant up km1 km2 km3 kw1 --parallel
 ```
 
 Stopping Kubernetes setup

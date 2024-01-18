@@ -2,3 +2,5 @@
 vip: 172.16.0.100
 
 primary_master_hostname: km1
+
+calico_version: 3.27.0
