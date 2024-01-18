@@ -50,8 +50,9 @@ Vagrant.configure(2) do |config|
       lb.vm.network "public_network", bridge: "K8sLabSwitch"
 
       lb.vm.provider :hyperv do |v|
-        v.memory  = 768
-        v.cpus    = 1
+        v.maxmemory = 1024
+        v.memory = 768
+        v.cpus = 1
 
         v.enable_virtualization_extensions  = true
         v.linked_clone = true
@@ -94,8 +95,9 @@ Vagrant.configure(2) do |config|
 
       cp.vm.provider :hyperv do |v|
         # kubeadm requires at least 1700Mb
-        v.memory  = 2048
-        v.cpus    = 2
+        v.maxmemory = 3072
+        v.memory = 2048
+        v.cpus = 4
 
         v.enable_virtualization_extensions  = true
         v.linked_clone = true
@@ -136,8 +138,9 @@ Vagrant.configure(2) do |config|
       wrk.vm.network "private_network", bridge: "K8sLabSwitch"
 
       wrk.vm.provider :hyperv do |v|
-        v.memory  = 2048
-        v.cpus    = 2
+        v.maxmemory = 4096
+        v.memory = 3072
+        v.cpus = 4
 
         v.enable_virtualization_extensions  = true
         v.linked_clone = true
