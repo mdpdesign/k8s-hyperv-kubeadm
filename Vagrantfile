@@ -21,6 +21,9 @@ Vagrant.configure(2) do |config|
   # Setup static IP for the given vSwitch
   config.vm.provision "staticip", type: "shell", path: "scripts/static_ip.sh", reset: true
 
+  # Upgrade system and kernel
+  config.vm.provision "update", type: "shell", path: "scripts/update.sh", reboot: true
+
   # Just upload files to VMs, synced folders with Hyper-V are problematic
   config.vm.provision "uploadfiles", type: "file", run: "always", source: "ansible", destination: "/tmp/ansible"
 
@@ -28,7 +31,7 @@ Vagrant.configure(2) do |config|
   # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
   # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
   # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
-  
+
   ubnt_box_name = "generic/ubuntu2204"
   ubnt_box_version = "4.3.10"
 
@@ -61,6 +64,8 @@ Vagrant.configure(2) do |config|
         IP_ADDRESS: "172.16.0.5#{i}"
       }
 
+      lb.vm.provision "update", type: "shell"
+
       # Allow to run single provisioner by specifying name
       # vagrant provision lb1 --provision-with mainconfig
       lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
@@ -73,21 +78,21 @@ Vagrant.configure(2) do |config|
   end
 
 
-  # Kubernetes Master Nodes
-  MasterCount = 3
+  # Kubernetes Control Plane Nodes
+  CPCount = 3
 
-  (1..MasterCount).each do |i|
+  (1..CPCount).each do |i|
 
-    config.vm.define "km#{i}" do |masternode|
+    config.vm.define "km#{i}" do |cp|
 
-      masternode.vm.box               = ubnt_box_name
-      masternode.vm.box_check_update  = false
-      masternode.vm.box_version       = ubnt_box_version
-      masternode.vm.hostname          = "km#{i}.lab.local"
+      cp.vm.box               = ubnt_box_name
+      cp.vm.box_check_update  = false
+      cp.vm.box_version       = ubnt_box_version
+      cp.vm.hostname          = "km#{i}.lab.local"
 
-      masternode.vm.network "private_network", bridge: "K8sLabSwitch"
+      cp.vm.network "private_network", bridge: "K8sLabSwitch"
 
-      masternode.vm.provider :hyperv do |v|
+      cp.vm.provider :hyperv do |v|
         # kubeadm requires at least 1700Mb
         v.memory  = 2048
         v.cpus    = 2
@@ -99,11 +104,13 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      masternode.vm.provision "staticip", type: "shell", env: {
+      cp.vm.provision "staticip", type: "shell", env: {
         IP_ADDRESS: "172.16.0.10#{i}"
       }
 
-      masternode.vm.provision "mainconfig", type: "ansible_local" do |ans|
+      cp.vm.provision "update", type: "shell"
+
+      cp.vm.provision "mainconfig", type: "ansible_local" do |ans|
         ans.provisioning_path = "/tmp/ansible"
         ans.playbook = "kmaster.yaml"
         ans.verbose = "-v"
@@ -115,20 +122,20 @@ Vagrant.configure(2) do |config|
 
 
   # Kubernetes Worker Nodes
-  WorkerCount = 1
+  WorkerCount = 3
 
   (1..WorkerCount).each do |i|
 
-    config.vm.define "kw#{i}" do |workernode|
+    config.vm.define "kw#{i}" do |wrk|
 
-      workernode.vm.box               = ubnt_box_name
-      workernode.vm.box_check_update  = false
-      workernode.vm.box_version       = ubnt_box_version
-      workernode.vm.hostname          = "kw#{i}.lab.local"
+      wrk.vm.box               = ubnt_box_name
+      wrk.vm.box_check_update  = false
+      wrk.vm.box_version       = ubnt_box_version
+      wrk.vm.hostname          = "kw#{i}.lab.local"
 
-      workernode.vm.network "private_network", bridge: "K8sLabSwitch"
+      wrk.vm.network "private_network", bridge: "K8sLabSwitch"
 
-      workernode.vm.provider :hyperv do |v|
+      wrk.vm.provider :hyperv do |v|
         v.memory  = 2048
         v.cpus    = 2
 
@@ -139,11 +146,13 @@ Vagrant.configure(2) do |config|
         }
       end
 
-      workernode.vm.provision "staticip", type: "shell", env: {
+      wrk.vm.provision "staticip", type: "shell", env: {
         IP_ADDRESS: "172.16.0.20#{i}"
       }
 
-      workernode.vm.provision "mainconfig", type: "ansible_local" do |ans|
+      wrk.vm.provision "update", type: "shell"
+
+      wrk.vm.provision "mainconfig", type: "ansible_local" do |ans|
         ans.provisioning_path = "/tmp/ansible"
         ans.playbook = "kworker.yaml"
         ans.verbose = "-v"
