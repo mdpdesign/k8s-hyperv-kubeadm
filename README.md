@@ -2,7 +2,7 @@
 
 This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA
 
-![k8s-ha-hyperv drawio](https://github.com/mdpdesign/k8s-hyperv-kubeadm/assets/5243838/0ab21f7a-0f59-4fdd-bd55-5beb82221a63)
+![Kubernetes HA diagram](./docs/k8s-ha-hyperv-sketch.drawio.svg)
 
 This whole setup is configured to run on Windows with Hyper-V as provider
 
