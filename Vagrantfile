@@ -31,7 +31,9 @@ Vagrant.configure(2) do |config|
   # Enable-WindowsOptionalFeature -Online -FeatureName SmbDirect -All -Verbose
   # config.vagrant.sensitive = [ENV["SMB_USR"], ENV["SMB_PSW"]]
   # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 
+  # Which Vagrant box to use
   ubnt_box_name = "generic/ubuntu2204"
   ubnt_box_version = "4.3.10"
 
