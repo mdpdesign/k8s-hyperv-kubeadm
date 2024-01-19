@@ -44,10 +44,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "lb#{i}" do |lb|
 
-      lb.vm.box               = ubnt_box_name
-      lb.vm.box_check_update  = false
-      lb.vm.box_version       = ubnt_box_version
-      lb.vm.hostname          = "lb#{i}.lab.local"
+      lb.vm.box              = ubnt_box_name
+      lb.vm.box_check_update = false
+      lb.vm.box_version      = ubnt_box_version
+      lb.vm.hostname         = "lb#{i}.lab.local"
 
       lb.vm.network "public_network", bridge: "K8sLabSwitch"
 
@@ -88,10 +88,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "km#{i}" do |cp|
 
-      cp.vm.box               = ubnt_box_name
-      cp.vm.box_check_update  = false
-      cp.vm.box_version       = ubnt_box_version
-      cp.vm.hostname          = "km#{i}.lab.local"
+      cp.vm.box              = ubnt_box_name
+      cp.vm.box_check_update = false
+      cp.vm.box_version      = ubnt_box_version
+      cp.vm.hostname         = "km#{i}.lab.local"
 
       cp.vm.network "private_network", bridge: "K8sLabSwitch"
 
@@ -132,10 +132,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "kw#{i}" do |wrk|
 
-      wrk.vm.box               = ubnt_box_name
-      wrk.vm.box_check_update  = false
-      wrk.vm.box_version       = ubnt_box_version
-      wrk.vm.hostname          = "kw#{i}.lab.local"
+      wrk.vm.box              = ubnt_box_name
+      wrk.vm.box_check_update = false
+      wrk.vm.box_version      = ubnt_box_version
+      wrk.vm.hostname         = "kw#{i}.lab.local"
 
       wrk.vm.network "private_network", bridge: "K8sLabSwitch"
 
