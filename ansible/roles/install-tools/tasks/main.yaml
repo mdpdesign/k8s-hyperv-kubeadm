@@ -9,3 +9,13 @@
     remote_src: true
     extra_opts:
       - --strip-components=1
+
+- name: Install k9s
+  ansible.builtin.unarchive:
+    src: "{{ k9s_url }}"
+    dest: /usr/local/bin/
+    creates: /usr/local/bin/k9s
+    exclude:
+      - README.md
+      - LICENSE
+    remote_src: true
