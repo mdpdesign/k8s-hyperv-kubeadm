@@ -1,6 +1,8 @@
 # Kubernetes on Hyper-V with Vagrant, Ansible & kubeadm
 
-This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 data-plane worker node + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA
+This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA
+
+![k8s-ha-hyperv drawio](https://github.com/mdpdesign/k8s-hyperv-kubeadm/assets/5243838/0ab21f7a-0f59-4fdd-bd55-5beb82221a63)
 
 This whole setup is configured to run on Windows with Hyper-V as provider
 
