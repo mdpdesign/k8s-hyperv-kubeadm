@@ -19,9 +19,9 @@
         - { port: 10250 }
         - { port: 30000:32767 }
 
-    - name: Include containerd setup tasks
+    - name: Include K8s setup tasks
       ansible.builtin.include_role:
-        name: install-containerd
+        name: install-k8s
 
     # Fetch join command from primary master, ugly but works..
     - name: Fetch join command from primary master

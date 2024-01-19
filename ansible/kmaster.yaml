@@ -27,9 +27,9 @@
         - { port: 2379:2380 }
         - { port: 60000:61000 }
 
-    - name: Include containerd setup tasks
+    - name: Include K8s setup tasks
       ansible.builtin.include_role:
-        name: install-containerd
+        name: install-k8s
 
     # Initialize K8s cluster, run only on primary master
     - name: Initialize K8s cluster with kubeadm
