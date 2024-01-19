@@ -10,7 +10,7 @@ Minimum host requirements
 
 - Windows 10/11 Professional or Server edition (tested on Windows 10 and 11)
 - Min. 4 core CPU recommended
-- Min. 16GB of RAM **required**
+- Min. 16GB of RAM **required** (adjust VMs memory accordingly in `Vagrantfile`)
 - Hyper-V feature enabled
 
 ## Steps required for installation
@@ -61,9 +61,9 @@ For Vagrant to work with Hyper-V - Terminal must be run as Administrator user
 vagrant up
 
 # or when setup was already provisioned before etc.
-vagrant up --parallel
-vagrant up lb1 lb2 --parallel
-vagrant up km1 km2 km3 kw1 --parallel
+vagrant up
+vagrant up lb1 lb2
+vagrant up km1 km2 km3 kw1
 ```
 
 Stopping Kubernetes setup
@@ -75,15 +75,47 @@ vagrant halt
 Destroying Kubernetes setup
 
 ```powershell
+vagrant destroy
+
+# or
 vagrant destroy --force
 ```
 
 ## Development
 
-Running only main provisioning after VMs are set up with static IP:
+For development purposes or to play around with just Kubernetes setup & Ansible it's easier to first provision VMs with static IP and updates,
+then create a snapshot, so that VMs can be restored easily omiting the initial setup (saving some time). For e.g:
 
 ```powershell
-vagrant up km1 --provision-with uploadfiles,mainconfig
+# Create all VMs and run only shell provisioners
+vagrant up --provision-with shell
+
+# or create only selected VMs and run shell provisioners
+vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with shell
+
+# or to be more specific
+# for all VMs
+vagrant up --provision-with staticip,update
+
+# for selected VMs
+vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with staticip,update
+
+# then create checkpoint/snapshot either via Hyper-V GUI or
+# for all VMs
+vagrant snapshot save initial-setup
+
+# for selected VMs
+vagrant snapshot save lb1 lb2 km1 km2 km3 kw1 ... initial-setup
+```
+
+Running only main provisioning after VMs are set up with static IP and updates:
+
+```powershell
+# for all VMs
+vagrant up --provision-with uploadfiles,mainconfig
+
+# for selected VMs
+vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with uploadfiles,mainconfig
 ```
 
 Resetting kubeadm init:
@@ -103,5 +135,3 @@ sudo kubeadm init...
 - Add WSL instructions
   - Vagrant integration
   - IPv6 issue
-- Add more Development instructions
-  - Hyper-V checkpoint to quickly restore VM etc.
