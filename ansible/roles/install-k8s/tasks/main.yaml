@@ -69,22 +69,23 @@
     regexp: '(\s+)SystemdCgroup = false$'
     replace: '\1SystemdCgroup = true'
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 - name: Add K8 repository
   ansible.builtin.deb822_repository:
     name: kubernetes
     types: deb
-    uris: https://pkgs.k8s.io/core:/stable:/v1.29/deb/
+    uris: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/"
     suites: /
     architectures: amd64
-    signed_by: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+    signed_by: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key"
 
-- name: Install K8s binaries
+- name: Install required packages and K8s binaries
   ansible.builtin.apt:
     name:
-      - apt-transport-https
-      - "kubeadm={{ kubernetes_version }}"
-      - "kubelet={{ kubernetes_version }}"
-      - "kubectl={{ kubernetes_version }}"
+      - sshpass
+      - "kubeadm={{ kubernetes_package_version }}"
+      - "kubelet={{ kubernetes_package_version }}"
+      - "kubectl={{ kubernetes_package_version }}"
     state: present
     update_cache: true
     autoclean: true

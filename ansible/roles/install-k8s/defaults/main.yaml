@@ -1,5 +1,6 @@
 # Version of Kubernetes to be installed
-kubernetes_version: 1.29.1-1.1
+kubernetes_version: 1.29
+kubernetes_package_version: 1.29.1-1.1
 
 # Container runtime versions
 containerd_version: 1.7.12
