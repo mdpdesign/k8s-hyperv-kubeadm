@@ -29,7 +29,7 @@
         cmd: >-
           /usr/bin/sshpass -p "vagrant"
           scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-          vagrant@172.16.0.101:/home/vagrant/join-command /home/vagrant/join-command
+          vagrant@{{ primary_master_ip }}:/home/vagrant/join-command /home/vagrant/join-command
           && chown vagrant:vagrant /home/vagrant/join-command
       register: copy_join_cmd
       until: copy_join_cmd is not failed
