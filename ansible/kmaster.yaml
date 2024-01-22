@@ -61,6 +61,13 @@
               environment:
                 KUBECONFIG: /etc/kubernetes/admin.conf
 
+        - name: Install metallb
+          ansible.builtin.include_role:
+            name: install-metallb
+            apply:
+              environment:
+                KUBECONFIG: /etc/kubernetes/admin.conf
+
     # Fetch join command from primary master, ugly but works..
     - name: Join non-primary master to cluster
       when: not ansible_hostname == primary_master_hostname

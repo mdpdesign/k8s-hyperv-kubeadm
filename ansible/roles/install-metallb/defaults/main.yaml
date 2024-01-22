@@ -1,0 +1,6 @@
+metallb_repo_url: https://metallb.github.io/metallb
+metallb_chart_ref: metallb/metallb
+metallb_chart_version: 0.13.12
+
+metallb_ipaddresspool_addresses:
+  - 172.16.0.240-172.16.0.250

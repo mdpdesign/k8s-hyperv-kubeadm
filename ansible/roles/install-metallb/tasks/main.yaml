@@ -1,0 +1,44 @@
+---
+- name: Add metallb helm repository
+  kubernetes.core.helm_repository:
+    name: metallb
+    repo_url: "{{ metallb_repo_url }}"
+
+- name: Deploy metallb
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: "{{ metallb_chart_ref }}"
+    chart_version: "{{ metallb_chart_version }}"
+    release_namespace: metallb-system
+    create_namespace: true
+    update_repo_cache: true
+    wait: true  # make sure metallb webhook svc can accept requests before creating CRs configs
+
+- name: Install required kubernetes library
+  ansible.builtin.pip:
+    name: kubernetes
+
+- name: Configure metallb IPAddressPool
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: main-pool
+        namespace: metallb-system
+      spec:
+        addresses: "{{ metallb_ipaddresspool_addresses }}"
+
+- name: Configure metallb L2Advertisement
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: main-l2advertisement
+        namespace: metallb-system
+      spec:
+        ipAddressPools:
+          - main-pool
