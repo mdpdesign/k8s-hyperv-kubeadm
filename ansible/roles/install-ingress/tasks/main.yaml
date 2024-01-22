@@ -12,3 +12,16 @@
     release_namespace: ingress-traefik
     create_namespace: true
     update_repo_cache: true
+    values:
+      # Show traefik service IP in ingress resource
+      providers:
+        kubernetesIngress:
+          publishedService:
+            enabled: true
+
+# Deploy traefik dashboard with web entrypoint
+- name: Deploy traefik web dashboard
+  when: traefik_deploy_dashboard
+  kubernetes.core.k8s:
+    state: present
+    src: files/ingressroute-dashboard.yaml

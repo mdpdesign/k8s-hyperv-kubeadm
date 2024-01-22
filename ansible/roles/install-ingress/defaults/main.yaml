@@ -1,3 +1,4 @@
 traefik_repo_url: https://traefik.github.io/charts
 traefik_chart_ref: traefik/traefik
 traefik_chart_version: 26.0.0
+traefik_deploy_dashboard: true
