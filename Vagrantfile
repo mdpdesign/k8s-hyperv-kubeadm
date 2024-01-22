@@ -16,6 +16,13 @@
 # TODO: Check if needed
 # ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
+VAGRANT_BOX         = "generic/ubuntu2204"
+VAGRANT_BOX_VERSION = "4.3.10"
+HYPERV_SWITCH       = "K8sLabSwitch"
+COUNT_LB            = 2
+COUNT_CP_NODES      = 3
+COUNT_WORKER_NODES  = 3
+
 Vagrant.configure(2) do |config|
 
   # Setup static IP for the given vSwitch
@@ -33,32 +40,25 @@ Vagrant.configure(2) do |config|
   # config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: ENV["SMB_USR"], smb_password: ENV["SMB_PSW"]
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
-  # Which Vagrant box to use
-  ubnt_box_name = "generic/ubuntu2204"
-  ubnt_box_version = "4.3.10"
-
-  # Load Balancer Nodes
-  LoadBalancerCount = 2
-
-  (1..LoadBalancerCount).each do |i|
+  (1..COUNT_LB).each do |i|
 
     config.vm.define "lb#{i}" do |lb|
 
-      lb.vm.box              = ubnt_box_name
+      lb.vm.box              = VAGRANT_BOX
       lb.vm.box_check_update = false
-      lb.vm.box_version      = ubnt_box_version
+      lb.vm.box_version      = VAGRANT_BOX_VERSION
       lb.vm.hostname         = "lb#{i}.lab.local"
 
-      lb.vm.network "public_network", bridge: "K8sLabSwitch"
+      lb.vm.network "public_network", bridge: HYPERV_SWITCH
 
       lb.vm.provider :hyperv do |v|
         v.maxmemory = 1024
-        v.memory = 768
-        v.cpus = 1
+        v.memory    = 768
+        v.cpus      = 1
 
-        v.enable_virtualization_extensions  = true
-        v.linked_clone = true
-        v.vm_integration_services = {
+        v.enable_virtualization_extensions = true
+        v.linked_clone                     = true
+        v.vm_integration_services          = {
           guest_service_interface: true
         }
       end
@@ -80,30 +80,26 @@ Vagrant.configure(2) do |config|
 
   end
 
-
-  # Kubernetes Control Plane Nodes
-  CPCount = 3
-
-  (1..CPCount).each do |i|
+  (1..COUNT_CP_NODES).each do |i|
 
     config.vm.define "km#{i}" do |cp|
 
-      cp.vm.box              = ubnt_box_name
+      cp.vm.box              = VAGRANT_BOX
       cp.vm.box_check_update = false
-      cp.vm.box_version      = ubnt_box_version
+      cp.vm.box_version      = VAGRANT_BOX_VERSION
       cp.vm.hostname         = "km#{i}.lab.local"
 
-      cp.vm.network "private_network", bridge: "K8sLabSwitch"
+      cp.vm.network "private_network", bridge: HYPERV_SWITCH
 
       cp.vm.provider :hyperv do |v|
         # kubeadm requires at least 1700Mb
-        v.maxmemory = 3072
-        v.memory = 2048
-        v.cpus = 4
+        v.maxmemory = 2048
+        v.memory    = 2048
+        v.cpus      = 4
 
-        v.enable_virtualization_extensions  = true
-        v.linked_clone = true
-        v.vm_integration_services = {
+        v.enable_virtualization_extensions = true
+        v.linked_clone                     = true
+        v.vm_integration_services          = {
           guest_service_interface: true
         }
       end
@@ -124,29 +120,25 @@ Vagrant.configure(2) do |config|
 
   end
 
-
-  # Kubernetes Worker Nodes
-  WorkerCount = 3
-
-  (1..WorkerCount).each do |i|
+  (1..COUNT_WORKER_NODES).each do |i|
 
     config.vm.define "kw#{i}" do |wrk|
 
-      wrk.vm.box              = ubnt_box_name
+      wrk.vm.box              = VAGRANT_BOX
       wrk.vm.box_check_update = false
-      wrk.vm.box_version      = ubnt_box_version
+      wrk.vm.box_version      = VAGRANT_BOX_VERSION
       wrk.vm.hostname         = "kw#{i}.lab.local"
 
-      wrk.vm.network "private_network", bridge: "K8sLabSwitch"
+      wrk.vm.network "private_network", bridge: HYPERV_SWITCH
 
       wrk.vm.provider :hyperv do |v|
-        v.maxmemory = 4096
-        v.memory = 3072
-        v.cpus = 4
+        v.maxmemory = 2048
+        v.memory    = 2048
+        v.cpus      = 4
 
-        v.enable_virtualization_extensions  = true
-        v.linked_clone = true
-        v.vm_integration_services = {
+        v.enable_virtualization_extensions = true
+        v.linked_clone                     = true
+        v.vm_integration_services          = {
           guest_service_interface: true
         }
       end
