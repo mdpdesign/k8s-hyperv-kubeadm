@@ -1,6 +1,16 @@
 # Kubernetes on Hyper-V with Vagrant, Ansible & kubeadm
 
-This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA
+This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA.
+
+Kubernetes setup includes:
+
+- [Calico](https://docs.tigera.io/calico/latest/about/) CNI
+- [Metallb](https://metallb.universe.tf/) deployment for `LoadBalancer` type services
+- [Traefik](https://traefik.io/traefik/) ingress controller
+- Control Plane tools:
+  - [helm](https://helm.sh/)
+  - [k9s](https://k9scli.io/)
+  - `k`, `kn` & `h` aliases for kubectl and helm + autocompletion
 
 ![Kubernetes HA diagram](./docs/k8s-ha-hyperv-sketch.drawio.svg)
 
