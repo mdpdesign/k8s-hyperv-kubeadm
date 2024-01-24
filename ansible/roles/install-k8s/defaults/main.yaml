@@ -7,7 +7,7 @@ containerd_version: 1.7.12
 runc_version: 1.1.11
 cni_plugins_version: 1.4.0
 
-containerd_url: https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz
-containerd_service_url: https://raw.githubusercontent.com/containerd/containerd/v{{ containerd_version }}/containerd.service
-runc_url: https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.amd64
-cni_plugins_url: https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz
+containerd_url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz"
+containerd_service_url: "https://raw.githubusercontent.com/containerd/containerd/v{{ containerd_version }}/containerd.service"
+runc_url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.amd64"
+cni_plugins_url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz"
