@@ -1,0 +1,7 @@
+---
+grafana:
+  ingress:
+    enabled: "{{ monitoring_deploy_dashboard }}"
+    ingressClassName: traefik
+    hosts:
+      - grafana.lab.local

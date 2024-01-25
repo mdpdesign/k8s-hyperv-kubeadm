@@ -1,0 +1,15 @@
+---
+- name: Add Prometheus Grafana helm repository
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: "{{ monitoring_repo_url }}"
+
+- name: Deploy monitoring stack
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: "{{ monitoring_chart_ref }}"
+    chart_version: "{{ monitoring_chart_version }}"
+    release_namespace: monitoring
+    create_namespace: true
+    update_repo_cache: true
+    values: "{{ lookup('ansible.builtin.template', 'values.yaml') | from_yaml }}"
