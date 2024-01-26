@@ -53,7 +53,8 @@ New-NetIPAddress –IPAddress 172.16.0.1 -PrefixLength 24 -InterfaceIndex $IfInd
 New-NetNat -name "K8sNAT" -InternalIPInterfaceAddressPrefix 172.16.0.0/24
 
 # Enable forwarding - for e.g. to access cluster from WSL
-Get-NetIPInterface | where {$_.InterfaceAlias -match 'vEthernet \(WSL' -or $_.InterfaceAlias -eq 'vEthernet (Default Switch)' -or $_.InterfaceAlias -match 'K8sLabSwitch'} | Set-NetIPInterface -Forwarding Enabled -PolicyStore PersistentStore -Verbose
+# This command must be run sometimes on every reboot of the host
+Get-NetIPInterface | where {$_.InterfaceAlias -match 'vEthernet \(WSL' -or $_.InterfaceAlias -eq 'vEthernet (Default Switch)' -or $_.InterfaceAlias -match 'K8sLabSwitch'} | Set-NetIPInterface -Forwarding Enabled -Verbose
 ```
 
 Verify if we can connect from within WSL instance to Kubernetes cluster
