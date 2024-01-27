@@ -1,0 +1,27 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "{{ ansible_default_ipv4.address }}"
+  bindPort: 6443
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+clusterName: "{{ cluster_name }}"
+controlPlaneEndpoint: "{{ vip }}"
+networking:
+  podSubnet: "192.168.0.0/16"
+etcd:
+  local:
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+controllerManager:
+  extraArgs:
+    bind-address: "0.0.0.0"
+scheduler:
+  extraArgs:
+    bind-address: "0.0.0.0"
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+metricsBindAddress: "0.0.0.0:10249"

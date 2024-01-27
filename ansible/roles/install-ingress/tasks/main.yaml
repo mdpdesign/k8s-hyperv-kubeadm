@@ -18,6 +18,16 @@
         kubernetesIngress:
           publishedService:
             enabled: true
+      # Prevent Docker hub limits
+      image:
+        registry: public.ecr.aws
+        repository: docker/library/traefik
+
+- name: Install kubernetes library for Ansible
+  ansible.builtin.pip:
+    name:
+      - kubernetes
+    state: present
 
 # Deploy traefik dashboard with web entrypoint
 - name: Deploy traefik web dashboard

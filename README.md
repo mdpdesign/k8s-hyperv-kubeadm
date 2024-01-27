@@ -57,24 +57,20 @@ New-NetNat -name "K8sNAT" -InternalIPInterfaceAddressPrefix 172.16.0.0/24
 Get-NetIPInterface | where {$_.InterfaceAlias -match 'vEthernet \(WSL' -or $_.InterfaceAlias -eq 'vEthernet (Default Switch)' -or $_.InterfaceAlias -match 'K8sLabSwitch'} | Set-NetIPInterface -Forwarding Enabled -Verbose
 ```
 
-Verify if we can connect from within WSL instance to Kubernetes cluster
-
-```bash
-curl -v -k https://172.16.0.100:6443/healthz
-```
-
 ## Start Kubernetes setup
 
 For Vagrant to work with Hyper-V - Terminal must be run as Administrator user
 
 ```powershell
-# Simply
-vagrant up
+# 1. Create all VMs and run only shell provisioner, this will assign static IP and update the system
+vagrant up --provision-with shell
 
-# or when setup was already provisioned before etc.
-vagrant up
-vagrant up lb1 lb2
-vagrant up km1 km2 km3 kw1
+# 2. Setup load balancers and bootstrap Kubernetes on all VMs
+vagrant provision --provision-with uploadfiles,bootstrap
+
+# 3. Install metallb, ingress controller and monitoring, this provisioner is not executed by default
+# as Kubernetes cluster must be bootstrapped first to be able to schedule workloads etc.
+vagrant provision km1 --provision-with uploadfiles,addons
 ```
 
 Stopping Kubernetes setup
@@ -123,10 +119,10 @@ Running only main provisioning after VMs are set up with static IP and updates:
 
 ```powershell
 # for all VMs
-vagrant up --provision-with uploadfiles,mainconfig
+vagrant up --provision-with uploadfiles,bootstrap
 
 # for selected VMs
-vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with uploadfiles,mainconfig
+vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with uploadfiles,bootstrap
 ```
 
 Resetting kubeadm init:
@@ -134,6 +130,12 @@ Resetting kubeadm init:
 ```bash
 sudo kubeadm reset
 sudo kubeadm init...
+```
+
+Verify if we can connect from within WSL instance to Kubernetes cluster
+
+```bash
+curl -v -k https://172.16.0.100:6443/healthz
 ```
 
 ## Recommended tools to work easier with Kubernetes
@@ -146,3 +148,5 @@ sudo kubeadm init...
 - Add WSL instructions
   - Vagrant integration
   - IPv6 issue
+  - [Registry](https://goharbor.io/)
+  - NFS as storage

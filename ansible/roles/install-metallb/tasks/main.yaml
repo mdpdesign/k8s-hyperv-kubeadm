@@ -14,9 +14,11 @@
     update_repo_cache: true
     wait: true  # make sure metallb webhook svc can accept requests before creating CRs configs
 
-- name: Install required kubernetes library
+- name: Install kubernetes library for Ansible
   ansible.builtin.pip:
-    name: kubernetes
+    name:
+      - kubernetes
+    state: present
 
 - name: Configure metallb IPAddressPool
   kubernetes.core.k8s:

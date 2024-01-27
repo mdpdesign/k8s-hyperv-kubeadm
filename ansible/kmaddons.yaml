@@ -1,0 +1,30 @@
+---
+- name: Deploy metallb, ingress controller and monitoring
+  hosts: km1
+  connection: local
+  become: true
+
+  tasks:
+    # Deploy "addons", run only on primary master
+    - name: Deploy stacks to K8s
+      block:
+        - name: Install ingress controller
+          ansible.builtin.include_role:
+            name: install-ingress
+            apply:
+              environment:
+                KUBECONFIG: /etc/kubernetes/admin.conf
+
+        - name: Install metallb
+          ansible.builtin.include_role:
+            name: install-metallb
+            apply:
+              environment:
+                KUBECONFIG: /etc/kubernetes/admin.conf
+
+        - name: Install monitoring stack - Prometheus & Grafana
+          ansible.builtin.include_role:
+            name: install-monitoring
+            apply:
+              environment:
+                KUBECONFIG: /etc/kubernetes/admin.conf

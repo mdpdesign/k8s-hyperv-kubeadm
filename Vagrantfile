@@ -54,7 +54,7 @@ Vagrant.configure(2) do |config|
       lb.vm.provider :hyperv do |v|
         v.maxmemory = 1024
         v.memory    = 768
-        v.cpus      = 1
+        v.cpus      = 2
 
         v.enable_virtualization_extensions = true
         v.linked_clone                     = true
@@ -70,8 +70,8 @@ Vagrant.configure(2) do |config|
       lb.vm.provision "update", type: "shell"
 
       # Allow to run single provisioner by specifying name
-      # vagrant provision lb1 --provision-with mainconfig
-      lb.vm.provision "mainconfig", type: "ansible_local" do |ans|
+      # vagrant provision lb1 --provision-with bootstrap
+      lb.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
         ans.playbook = "lb.yaml"
       end
@@ -110,9 +110,16 @@ Vagrant.configure(2) do |config|
 
       cp.vm.provision "update", type: "shell"
 
-      cp.vm.provision "mainconfig", type: "ansible_local" do |ans|
+      cp.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "kmaster.yaml"
+        ans.playbook = "kmbootstrap.yaml"
+        ans.verbose = "-v"
+      end
+
+      # This provisioner has to be executed explicitly
+      cp.vm.provision "addons", type: "ansible_local", run: "never" do |ans|
+        ans.provisioning_path = "/home/vagrant/k8s-ansible"
+        ans.playbook = "kmaddons.yaml"
         ans.verbose = "-v"
       end
 
@@ -149,9 +156,9 @@ Vagrant.configure(2) do |config|
 
       wrk.vm.provision "update", type: "shell"
 
-      wrk.vm.provision "mainconfig", type: "ansible_local" do |ans|
+      wrk.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "kworker.yaml"
+        ans.playbook = "kwbootstrap.yaml"
         ans.verbose = "-v"
       end
 
