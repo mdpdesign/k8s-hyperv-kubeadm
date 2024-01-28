@@ -28,3 +28,10 @@
             apply:
               environment:
                 KUBECONFIG: /etc/kubernetes/admin.conf
+
+        - name: Install NFS CSI driver
+          ansible.builtin.include_role:
+            name: install-nfs-csi
+            apply:
+              environment:
+                KUBECONFIG: /etc/kubernetes/admin.conf

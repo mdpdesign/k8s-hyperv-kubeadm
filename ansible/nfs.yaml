@@ -1,0 +1,61 @@
+---
+- name: Configure NFS Server
+  hosts: nfs*
+  connection: local
+  become: true
+  vars:
+    nfs_path: /nfs/k8slab
+    nfs_subnet: 172.16.0.0/24
+  tasks:
+    - name: Install NFS Server
+      ansible.builtin.apt:
+        package:
+          - nfs-kernel-server
+
+    - name: Create NFS directory
+      ansible.builtin.file:
+        path: "{{ nfs_path }}"
+        state: directory
+        owner: nobody
+        group: nogroup
+        mode: '0775'
+
+    - name: Create /etc/exports.d directory
+      ansible.builtin.file:
+        path: /etc/exports.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0775'
+
+    - name: Create Kubernetes exports file
+      ansible.builtin.copy:
+        dest: /etc/exports.d/k8slab.exports
+        content: |
+          {{ nfs_path }} {{ nfs_subnet }}(rw,sync,no_root_squash,no_subtree_check)
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Open firewall ports
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        direction: in
+        from: "{{ nfs_subnet }}"
+      loop:
+        - 22
+        - nfs
+
+    - name: Make exports
+      ansible.builtin.command:
+        cmd: exportfs -ar
+      notify: Restart NFS
+
+  handlers:
+    - name: Restart NFS
+      ansible.builtin.service:
+        name: nfs-server
+        state: restarted
+        enabled: true

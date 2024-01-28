@@ -52,6 +52,7 @@ Vagrant.configure(2) do |config|
       lb.vm.network "public_network", bridge: HYPERV_SWITCH
 
       lb.vm.provider :hyperv do |v|
+        v.vmname    = "k8slab-lb#{i}"
         v.maxmemory = 1024
         v.memory    = 768
         v.cpus      = 2
@@ -73,9 +74,47 @@ Vagrant.configure(2) do |config|
       # vagrant provision lb1 --provision-with bootstrap
       lb.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "lb.yaml"
+        ans.playbook          = "lb.yaml"
       end
 
+    end
+
+  end
+
+  config.vm.define "nfs" do |nfs|
+
+    nfs.vm.box              = VAGRANT_BOX
+    nfs.vm.box_check_update = false
+    nfs.vm.box_version      = VAGRANT_BOX_VERSION
+    nfs.vm.hostname         = "nfs.lab.local"
+
+    nfs.vm.network "public_network", bridge: HYPERV_SWITCH
+
+    nfs.vm.provider :hyperv do |v|
+      v.vmname    = "k8slab-nfs"
+      v.maxmemory = 2048
+      v.memory    = 1024
+      v.cpus      = 2
+
+      v.enable_virtualization_extensions = true
+      v.linked_clone                     = true
+      v.vm_integration_services          = {
+        guest_service_interface: true
+      }
+    end
+
+    nfs.vm.provision "staticip", type: "shell", env: {
+      IP_ADDRESS: "172.16.0.55"
+    }
+
+    nfs.vm.provision "update", type: "shell"
+
+    # Allow to run single provisioner by specifying name
+    # vagrant provision lb1 --provision-with bootstrap
+    nfs.vm.provision "bootstrap", type: "ansible_local" do |ans|
+      ans.provisioning_path = "/home/vagrant/k8s-ansible"
+      ans.playbook          = "nfs.yaml"
+      ans.verbose           = "-v"
     end
 
   end
@@ -92,6 +131,7 @@ Vagrant.configure(2) do |config|
       cp.vm.network "private_network", bridge: HYPERV_SWITCH
 
       cp.vm.provider :hyperv do |v|
+        v.vmname    = "k8slab-master#{i}"
         # kubeadm requires at least 1700Mb
         v.maxmemory = 2048
         v.memory    = 2048
@@ -112,15 +152,15 @@ Vagrant.configure(2) do |config|
 
       cp.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "kmbootstrap.yaml"
-        ans.verbose = "-v"
+        ans.playbook          = "kmbootstrap.yaml"
+        ans.verbose           = "-v"
       end
 
       # This provisioner has to be executed explicitly
       cp.vm.provision "addons", type: "ansible_local", run: "never" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "kmaddons.yaml"
-        ans.verbose = "-v"
+        ans.playbook          = "kmaddons.yaml"
+        ans.verbose           = "-v"
       end
 
     end
@@ -139,6 +179,7 @@ Vagrant.configure(2) do |config|
       wrk.vm.network "private_network", bridge: HYPERV_SWITCH
 
       wrk.vm.provider :hyperv do |v|
+        v.vmname    = "k8slab-worker#{i}"
         v.maxmemory = 2048
         v.memory    = 2048
         v.cpus      = 4
@@ -158,8 +199,8 @@ Vagrant.configure(2) do |config|
 
       wrk.vm.provision "bootstrap", type: "ansible_local" do |ans|
         ans.provisioning_path = "/home/vagrant/k8s-ansible"
-        ans.playbook = "kwbootstrap.yaml"
-        ans.verbose = "-v"
+        ans.playbook          = "kwbootstrap.yaml"
+        ans.verbose           = "-v"
       end
 
     end

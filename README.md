@@ -1,6 +1,6 @@
 # Kubernetes on Hyper-V with Vagrant, Ansible & kubeadm
 
-This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA.
+This is a "lab" Kubernetes HA setup with 3 control-plane nodes and 1 or more worker nodes + NFS server for storage and 2 loadbalancer VMs. Loadbalancer VMs use `keepalived` and `HAProxy` for HA.
 
 Kubernetes setup includes:
 
