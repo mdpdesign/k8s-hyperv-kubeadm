@@ -60,7 +60,7 @@
             content: "{{ kubeadm_init_cmd.stdout }}"
             dest: /home/vagrant/join-command
 
-        # TODO: Modify Installation resource to use quay.io registry to avoid docker hub limits
+        # Modify Installation resource to use quay.io registry to avoid docker hub limits
         # https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
         # https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
         # Uses the operator method - as it manages calico lifecycle
@@ -69,6 +69,7 @@
             cmd: |
               kubectl create -f "https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/tigera-operator.yaml"
               kubectl create -f "https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/custom-resources.yaml"
+              kubectl patch installation default -n calico-system -p '{"spec":{"registry":"quay.io/"}}' --type merge
           environment:
             KUBECONFIG: /etc/kubernetes/admin.conf
 
