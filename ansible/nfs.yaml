@@ -1,5 +1,5 @@
 ---
-- name: Configure loadbalancer
+- name: Configure NFS Server
   hosts: nfs*
   connection: local
   become: true
@@ -7,10 +7,6 @@
     nfs_path: /nfs/k8slab
     nfs_subnet: 172.16.0.0/24
   tasks:
-    # - name: Show facts
-    #   ansible.builtin.debug:
-    #     var: ansible_facts
-
     - name: Install NFS Server
       ansible.builtin.apt:
         package:
@@ -32,7 +28,7 @@
         group: root
         mode: '0775'
 
-    - name: Create exports file
+    - name: Create Kubernetes exports file
       ansible.builtin.copy:
         dest: /etc/exports.d/k8slab.exports
         content: |
