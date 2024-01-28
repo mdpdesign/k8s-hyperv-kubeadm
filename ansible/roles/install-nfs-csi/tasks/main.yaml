@@ -1,0 +1,57 @@
+---
+- name: Add NFS CSI helm repository
+  kubernetes.core.helm_repository:
+    name: csi-driver-nfs
+    repo_url: "{{ nfscsi_repo_url }}"
+
+- name: Deploy NFS CSI driver
+  kubernetes.core.helm:
+    name: csi-driver-nfs
+    chart_ref: "{{ nfscsi_chart_ref }}"
+    chart_version: "{{ nfscsi_chart_version }}"
+    release_namespace: kube-system
+    create_namespace: true
+    update_repo_cache: true
+    values:
+      controller:
+        runOnControlPlane: true
+
+- name: Install kubernetes library for Ansible
+  ansible.builtin.pip:
+    name:
+      - kubernetes
+    state: present
+
+- name: Configure ephemeral StorageClass
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: nfs-csi-ephemeral
+      provisioner: nfs.csi.k8s.io
+      parameters:
+        server: "{{ nfs_server_ip }}"
+        share: "{{ nfs_server_share }}"
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      mountOptions:
+        - nfsvers=4.1
+
+- name: Configure persistent StorageClass
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: nfs-csi
+      provisioner: nfs.csi.k8s.io
+      parameters:
+        server: "{{ nfs_server_ip }}"
+        share: "{{ nfs_server_share }}"
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      mountOptions:
+        - nfsvers=4.1

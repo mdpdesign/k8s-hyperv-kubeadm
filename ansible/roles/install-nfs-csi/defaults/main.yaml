@@ -1,0 +1,6 @@
+nfscsi_repo_url: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+nfscsi_chart_ref: csi-driver-nfs/csi-driver-nfs
+nfscsi_chart_version: v4.6.0
+
+nfs_server_ip: 172.16.0.55
+nfs_server_share: /nfs/k8slab

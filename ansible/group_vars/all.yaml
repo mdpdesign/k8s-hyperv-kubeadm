@@ -3,8 +3,6 @@ vip: 172.16.0.100
 
 cluster_name: k8s-lab
 
-nfs_server_ip: 172.16.0.55
-
 primary_master_hostname: km1
 primary_master_ip: 172.16.0.101
 
