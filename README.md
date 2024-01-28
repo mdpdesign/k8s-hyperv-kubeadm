@@ -145,8 +145,6 @@ curl -v -k https://172.16.0.100:6443/healthz
 
 ## TODO
 
-- Add WSL instructions
-  - Vagrant integration
-  - IPv6 issue
-  - [Registry](https://goharbor.io/)
-  - NFS as storage
+- NFS as storage
+- [Registry](https://goharbor.io/)
+- [Ansible Hyper-V scripts](https://github.com/jamiely/ansible-hyperv/tree/master)
