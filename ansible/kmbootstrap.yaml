@@ -27,12 +27,22 @@
         - { port: 10259 }
         - { port: 2379:2380 }
         - { port: 60000:61000 }
+        # DNS
+        - { port: 53, proto: "tcp", comment: "DNS" }
+        - { port: 53, proto: "udp", comment: "DNS" }
+        # https://metallb.universe.tf/#requirements
+        - { port: 7946, proto: "tcp", comment: "K8s Metallb member" }
+        - { port: 7946, proto: "udp", comment: "K8s Metallb member" }
+        # Monitoring
+        - { port: 2381, comment: "K8s Monitoring etcd" }
+        - { port: 9100, comment: "K8s Monitoring node-exporter" }
+        - { port: 10249, comment: "K8s Monitoring kube-proxy" }
         # Calico network requirements
         # https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements#network-requirements
-        - { port: 179, proto: "tcp", comment: "Calico req." }
-        - { port: 4789, proto: "udp", comment: "Calico req." }
-        - { port: 5473, proto: "tcp", comment: "Calico req." }
-        - { port: 51820:51821, proto: "udp", comment: "Calico req." }
+        - { port: 179, proto: "tcp", comment: "K8s Calico req." }
+        - { port: 4789, proto: "udp", comment: "K8s Calico req." }
+        - { port: 5473, proto: "tcp", comment: "K8s Calico req." }
+        - { port: 51820:51821, proto: "udp", comment: "K8s Calico req." }
 
     - name: Enable UFW firewall
       community.general.ufw:
