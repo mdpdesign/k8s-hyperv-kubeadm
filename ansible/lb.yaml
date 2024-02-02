@@ -19,7 +19,7 @@
     - name: Open VRRP for keepalived
       community.general.ufw:
         rule: allow
-        from: 224.0.0.18
+        to: 224.0.0.18
 
     - name: Enable UFW firewall
       community.general.ufw:
