@@ -132,8 +132,11 @@ Other useful commands
 Get-VM | Start-VM
 Get-VM | Stop-VM
 
-# Quickly restore VMs from snapshot
-Get-VM | Get-VMSnapshot | Restore-VMSnapshot
+# Quickly restore all VMs from snapshot
+Get-VM | Get-VMSnapshot | Restore-VMSnapshot -Confirm:$false
+
+# Restore only some VMs from snapshot
+Get-VM -Name "*lb*" | Get-VMSnapshot | Restore-VMSnapshot -Confirm:$false
 ```
 
 Resetting kubeadm init:
