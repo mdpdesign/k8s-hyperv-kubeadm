@@ -32,7 +32,7 @@
       ansible.builtin.copy:
         dest: /etc/exports.d/k8slab.exports
         content: |
-          {{ nfs_path }} {{ nfs_subnet }}(rw,sync,no_root_squash,no_subtree_check)
+          {{ nfs_path }} {{ nfs_subnet }}(rw,sync,no_subtree_check)
         owner: root
         group: root
         mode: '0600'
