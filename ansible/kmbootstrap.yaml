@@ -15,8 +15,9 @@
       community.general.ufw:
         rule: allow
         port: "{{ item.port }}"
-        proto: tcp
+        proto: "{{ item.proto | default('tcp') }}"
         direction: in
+        comment: "{{ item.comment | default('K8s requirement') }}"
       loop:
         - { port: 22 }
         - { port: 443 }
@@ -26,6 +27,12 @@
         - { port: 10259 }
         - { port: 2379:2380 }
         - { port: 60000:61000 }
+        # Calico network requirements
+        # https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements#network-requirements
+        - { port: 179, proto: "tcp", comment: "Calico req." }
+        - { port: 4789, proto: "udp", comment: "Calico req." }
+        - { port: 5473, proto: "tcp", comment: "Calico req." }
+        - { port: 51820:51821, proto: "udp", comment: "Calico req." }
 
     - name: Enable UFW firewall
       community.general.ufw:

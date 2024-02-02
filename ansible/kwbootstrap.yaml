@@ -13,8 +13,9 @@
       community.general.ufw:
         rule: allow
         port: "{{ item.port }}"
-        proto: tcp
+        proto: "{{ item.proto | default('tcp') }}"
         direction: in
+        comment: "{{ item.comment | default('K8s requirement') }}"
       loop:
         - { port: 22 }
         - { port: 10250 }
