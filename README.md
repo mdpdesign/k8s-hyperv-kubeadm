@@ -145,6 +145,5 @@ curl -v -k https://172.16.0.100:6443/healthz
 
 ## TODO
 
-- NFS as storage
 - [Registry](https://goharbor.io/)
 - [Ansible Hyper-V scripts](https://github.com/jamiely/ansible-hyperv/tree/master)
