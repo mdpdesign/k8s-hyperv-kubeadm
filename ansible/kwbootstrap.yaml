@@ -16,8 +16,13 @@
         proto: tcp
         direction: in
       loop:
+        - { port: 22 }
         - { port: 10250 }
         - { port: 30000:32767 }
+
+    - name: Enable UFW firewall
+      community.general.ufw:
+        state: enabled
 
     - name: Include K8s setup tasks
       ansible.builtin.include_role:

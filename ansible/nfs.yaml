@@ -48,6 +48,10 @@
         - 22
         - nfs
 
+    - name: Enable UFW firewall
+      community.general.ufw:
+        state: enabled
+
     - name: Make exports
       ansible.builtin.command:
         cmd: exportfs -ar
