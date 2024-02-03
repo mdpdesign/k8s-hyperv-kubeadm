@@ -40,13 +40,17 @@
     - name: Open firewall ports
       community.general.ufw:
         rule: allow
-        port: "{{ item }}"
+        port: "{{ item.port }}"
         proto: tcp
         direction: in
-        from: "{{ nfs_subnet }}"
+        from: "{{ item.from | default(omit) }}"
       loop:
-        - 22
-        - nfs
+        - { port: 22 }
+        - { port: nfs, from: "{{ nfs_subnet }}" }
+
+    - name: Enable UFW firewall
+      community.general.ufw:
+        state: enabled
 
     - name: Make exports
       ansible.builtin.command:

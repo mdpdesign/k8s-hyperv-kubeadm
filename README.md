@@ -125,6 +125,20 @@ vagrant up --provision-with uploadfiles,bootstrap
 vagrant up lb1 lb2 km1 km2 km3 kw1 ... --provision-with uploadfiles,bootstrap
 ```
 
+Other useful commands
+
+```powershell
+# Start/Stop VMs
+Get-VM | Start-VM
+Get-VM | Stop-VM
+
+# Quickly restore all VMs from snapshot
+Get-VM | Get-VMSnapshot | Restore-VMSnapshot -Confirm:$false
+
+# Restore only some VMs from snapshot
+Get-VM -Name "*lb*" | Get-VMSnapshot | Restore-VMSnapshot -Confirm:$false
+```
+
 Resetting kubeadm init:
 
 ```bash

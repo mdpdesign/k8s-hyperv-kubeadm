@@ -4,6 +4,27 @@
   connection: local
   become: true
   tasks:
+    - name: Open required firewall ports
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        direction: in
+      loop:
+        - 22
+        - 6443
+
+    # https://en.wikipedia.org/wiki/Multicast_address
+    # Notable IPv4 multicast addresses
+    - name: Open VRRP for keepalived
+      community.general.ufw:
+        rule: allow
+        to: 224.0.0.18
+
+    - name: Enable UFW firewall
+      community.general.ufw:
+        state: enabled
+
     - name: Install LB packages
       ansible.builtin.apt:
         name:
